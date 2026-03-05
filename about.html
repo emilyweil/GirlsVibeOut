@@ -153,22 +153,20 @@
         .question-form input:focus,
         .question-form textarea:focus { border-color: var(--teal); }
 
-        .question-submit {
-            width: 100%;
-            padding: 0.85rem;
-            background: var(--teal);
+        .question-form button {
+            padding: 0.7rem;
+            background: var(--text-dark);
             color: #fff;
             border: none;
             border-radius: 6px;
             font-family: inherit;
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
             transition: background 0.2s;
         }
 
-        .question-submit:hover { background: var(--teal-hover); }
-        .question-submit:disabled { opacity: 0.7; cursor: not-allowed; }
+        .question-form button:hover { background: var(--teal-dark); }
 
         .q-success, .q-error {
             display: none;
