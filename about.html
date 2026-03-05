@@ -11,9 +11,9 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --teal: #8cb4b4;
-            --teal-dark: #436187;
-            --teal-hover: #365070;
+            --teal: #6ba4a6;
+            --teal-dark: #6ba4a6;
+            --teal-hover: #57898b;
             --text-dark: #2C3E36;
             --text-gray: #4a5a52;
             --text-light: #7A8A7F;
@@ -105,6 +105,87 @@
             border-top: 1px solid var(--border);
         }
 
+        .question-section {
+            margin-top: 3rem;
+            padding-top: 2.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .question-section h2 {
+            font-family: 'Fraunces', serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .question-section p {
+            color: var(--text-gray);
+            font-size: 0.97rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .question-form {
+            background: #f8fbfb;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+        }
+
+        .question-form input,
+        .question-form textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1.5px solid var(--border);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.97rem;
+            color: var(--text-dark);
+            background: #fff;
+            outline: none;
+            resize: vertical;
+            transition: border-color 0.2s;
+        }
+
+        .question-form input:focus,
+        .question-form textarea:focus { border-color: var(--teal); }
+
+        .question-submit {
+            width: 100%;
+            padding: 0.85rem;
+            background: var(--teal);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .question-submit:hover { background: var(--teal-hover); }
+        .question-submit:disabled { opacity: 0.7; cursor: not-allowed; }
+
+        .q-success {
+            display: none;
+            text-align: center;
+            padding: 1.5rem 0 0.5rem;
+            color: var(--teal-dark);
+            font-family: 'Fraunces', serif;
+            font-size: 1.1rem;
+        }
+
+        .q-error {
+            display: none;
+            color: #c62828;
+            font-size: 0.88rem;
+            text-align: center;
+        }
+
         @media (max-width: 480px) {
             .about-header {
                 flex-direction: column;
@@ -140,9 +221,62 @@
             She's also published an e-book <a href="https://www.amazon.com/Moms-Snack-Packing-Sock-Finding-Negotiating-Parenting-ebook/dp/B0FSTD734J" style="color: var(--teal-dark); font-weight: 600; text-decoration: none;">AI for Moms</a>, a practical, no-jargon guide to using ChatGPT in everyday life.
         </p>
     </div>
+
+    <div class="question-section">
+        <h2>Have a question?</h2>
+        <p>Drop it here and we'll get back to you.</p>
+        <div class="question-form" id="q-form-wrap">
+            <div class="q-success" id="q-success">Thanks! We'll be in touch soon. 🙌</div>
+            <div id="q-fields">
+                <div style="display:flex;flex-direction:column;gap:0.9rem;">
+                    <input type="email" id="q-email" placeholder="your@email.com" required>
+                    <textarea id="q-text" rows="3" placeholder="Your question…" required></textarea>
+                    <button class="question-submit" id="q-btn" onclick="handleQuestion()">Send question</button>
+                    <p class="q-error" id="q-error">Something went wrong. Please try again.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <footer>© 2026 Girls Vibe Out</footer>
 
-</body>
-</html>
+<script>
+    async function handleQuestion() {
+        const btn = document.getElementById('q-btn');
+        const email = document.getElementById('q-email').value.trim();
+        const question = document.getElementById('q-text').value.trim();
+        const errorEl = document.getElementById('q-error');
+
+        if (!email || !question) {
+            errorEl.textContent = 'Please fill in your email and question.';
+            errorEl.style.display = 'block';
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = 'Sending…';
+        errorEl.style.display = 'none';
+
+        try {
+            const res = await fetch('https://hook.us2.make.com/iim7xbyxu7wc2of2fqpnkxsrlj1xmtd5', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    Email: email,
+                    Timestamp: new Date().toISOString(),
+                    Question: question
+                })
+            });
+            if (res.ok) {
+                document.getElementById('q-fields').style.display = 'none';
+                document.getElementById('q-success').style.display = 'block';
+            } else { throw new Error(); }
+        } catch {
+            btn.disabled = false;
+            btn.textContent = 'Send question';
+            errorEl.textContent = 'Something went wrong. Please try again.';
+            errorEl.style.display = 'block';
+        }
+    }
+</script>

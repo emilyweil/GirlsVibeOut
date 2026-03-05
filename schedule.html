@@ -11,9 +11,9 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --teal: #8cb4b4;
-            --teal-dark: #6a9898;
-            --teal-hover: #5a8888;
+            --teal: #6ba4a6;
+            --teal-dark: #6ba4a6;
+            --teal-hover: #57898b;
             --text-dark: #2C3E36;
             --text-gray: #4a5a52;
             --text-light: #7A8A7F;
@@ -298,7 +298,6 @@
 
             <div class="field-group">
                 <input type="email" id="sched-email" placeholder="your@email.com" required>
-                <textarea id="sched-note" rows="2" placeholder="Anything else you'd like us to know? (optional)"></textarea>
             </div>
 
             <button class="submit-button" id="submit-btn" onclick="handleSchedule()">Reserve my spot</button>
@@ -312,8 +311,7 @@
 <script>
     async function handleSchedule() {
         const btn = document.getElementById('submit-btn');
-        const email = document.getElementById('sched-email').value;
-        const note = document.getElementById('sched-note').value;
+        const email = document.getElementById('sched-email').value.trim();
         const errorEl = document.getElementById('sched-error');
 
         if (!email) {
@@ -322,8 +320,8 @@
             return;
         }
 
-        const checked = [...document.querySelectorAll('input[name="slots"]:checked')].map(c => c.value);
-        if (checked.length === 0) {
+        const checked = new Set([...document.querySelectorAll('input[name="slots"]:checked')].map(c => c.value));
+        if (checked.size === 0) {
             errorEl.textContent = 'Please select at least one time slot.';
             errorEl.style.display = 'block';
             return;
@@ -333,17 +331,26 @@
         btn.textContent = 'Sending…';
         errorEl.style.display = 'none';
 
+        const payload = {
+            Email: email,
+            Timestamp: new Date().toISOString(),
+            "Monday-AM":    checked.has("Monday 9AM EST")    ? "Yes" : "No",
+            "Monday-PM":    checked.has("Monday 12PM EST")   ? "Yes" : "No",
+            "Tuesday-AM":   checked.has("Tuesday 9AM EST")   ? "Yes" : "No",
+            "Tuesday-PM":   checked.has("Tuesday 12PM EST")  ? "Yes" : "No",
+            "Wednesday-AM": checked.has("Wednesday 9AM EST") ? "Yes" : "No",
+            "Wednesday-PM": checked.has("Wednesday 12PM EST")? "Yes" : "No",
+            "Thursday-AM":  checked.has("Thursday 9AM EST")  ? "Yes" : "No",
+            "Thursday-PM":  checked.has("Thursday 12PM EST") ? "Yes" : "No",
+            "Friday-AM":    checked.has("Friday 9AM EST")    ? "Yes" : "No",
+            "Friday-PM":    checked.has("Friday 12PM EST")   ? "Yes" : "No"
+        };
+
         try {
-            const res = await fetch('https://hook.us2.make.com/iim7xbyxu7wc2of2fqpnkxsrlj1xmtd5', {
+            const res = await fetch('https://hook.us2.make.com/vpyp39w592c0vbp4w6g8ntqewtyh0npc', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    email,
-                    selectedTimes: checked,
-                    note,
-                    timestamp: new Date().toISOString(),
-                    source: "Girls' Vibe Out - Schedule"
-                })
+                body: JSON.stringify(payload)
             });
             if (res.ok) {
                 document.getElementById('form-content').style.display = 'none';
