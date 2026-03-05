@@ -170,21 +170,13 @@
         .question-submit:hover { background: var(--teal-hover); }
         .question-submit:disabled { opacity: 0.7; cursor: not-allowed; }
 
-        .q-success {
+        .q-success, .q-error {
             display: none;
-            text-align: center;
-            padding: 1.5rem 0 0.5rem;
-            color: var(--teal-dark);
-            font-family: 'Fraunces', serif;
-            font-size: 1.1rem;
+            font-size: 0.95rem;
+            margin-top: 0.5rem;
         }
-
-        .q-error {
-            display: none;
-            color: #c62828;
-            font-size: 0.88rem;
-            text-align: center;
-        }
+        .q-success { color: #2e7d32; }
+        .q-error { color: #c62828; }
 
         @media (max-width: 480px) {
             .about-header {
@@ -225,17 +217,13 @@
     <div class="question-section">
         <h2>Have a question?</h2>
         <p>Drop it here and we'll get back to you.</p>
-        <div class="question-form" id="q-form-wrap">
-            <div class="q-success" id="q-success">Thanks! We'll be in touch soon. 🙌</div>
-            <div id="q-fields">
-                <div style="display:flex;flex-direction:column;gap:0.9rem;">
-                    <input type="email" id="q-email" placeholder="your@email.com" required>
-                    <textarea id="q-text" rows="3" placeholder="Your question…" required></textarea>
-                    <button class="question-submit" id="q-btn" onclick="handleQuestion()">Send question</button>
-                    <p class="q-error" id="q-error">Something went wrong. Please try again.</p>
-                </div>
-            </div>
-        </div>
+        <form class="question-form" id="question-form" onsubmit="return false;">
+            <input type="email" placeholder="your@email.com" required>
+            <textarea rows="3" placeholder="Your question..."></textarea>
+            <button type="button" onclick="handleQuestion()">Submit</button>
+        </form>
+        <p class="q-success" id="q-success">Thanks! We'll get back to you soon.</p>
+        <p class="q-error" id="q-error">Something went wrong. Please try again.</p>
     </div>
 </div>
 
@@ -243,39 +231,23 @@
 
 <script>
     async function handleQuestion() {
-        const btn = document.getElementById('q-btn');
-        const email = document.getElementById('q-email').value.trim();
-        const question = document.getElementById('q-text').value.trim();
+        const form = document.getElementById('question-form');
+        const email = form.querySelector('input[type="email"]').value;
+        const question = form.querySelector('textarea').value;
+        const successEl = document.getElementById('q-success');
         const errorEl = document.getElementById('q-error');
-
-        if (!email || !question) {
-            errorEl.textContent = 'Please fill in your email and question.';
-            errorEl.style.display = 'block';
-            return;
-        }
-
-        btn.disabled = true;
-        btn.textContent = 'Sending…';
-        errorEl.style.display = 'none';
-
         try {
             const res = await fetch('https://hook.us2.make.com/iim7xbyxu7wc2of2fqpnkxsrlj1xmtd5', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    Email: email,
-                    Timestamp: new Date().toISOString(),
-                    Question: question
-                })
+                body: JSON.stringify({ email, question, timestamp: new Date().toISOString(), source: "Girls Vibe Out" })
             });
             if (res.ok) {
-                document.getElementById('q-fields').style.display = 'none';
-                document.getElementById('q-success').style.display = 'block';
+                successEl.style.display = 'block';
+                errorEl.style.display = 'none';
+                form.style.display = 'none';
             } else { throw new Error(); }
         } catch {
-            btn.disabled = false;
-            btn.textContent = 'Send question';
-            errorEl.textContent = 'Something went wrong. Please try again.';
             errorEl.style.display = 'block';
         }
     }

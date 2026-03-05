@@ -332,8 +332,8 @@
         errorEl.style.display = 'none';
 
         const payload = {
-            Email: email,
-            Timestamp: new Date().toISOString(),
+            email: email,
+            timestamp: new Date().toISOString(),
             "Monday-AM":    checked.has("Monday 9AM EST")    ? "Yes" : "No",
             "Monday-PM":    checked.has("Monday 12PM EST")   ? "Yes" : "No",
             "Tuesday-AM":   checked.has("Tuesday 9AM EST")   ? "Yes" : "No",
